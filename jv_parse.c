@@ -244,10 +244,20 @@ static pfunc check_literal(struct jv_parser* p) {
     // FIXME: better parser
     p->tokenbuf[p->tokenpos] = 0; // FIXME: invalid
     char* end = 0;
-    double d = jvp_strtod(&p->dtoa, p->tokenbuf, &end);
-    if (end == 0 || *end != 0)
-      return "Invalid numeric literal";
-    TRY(value(p, jv_number(d)));
+    //if (0) {
+    if (!strpbrk(p->tokenbuf, ".e")) {
+        int64_t ll = strtoll(p->tokenbuf, &end, 10);
+        if (end != 0 && *end == 0) {
+            TRY(value(p, jv_integer(ll)));
+        } else {
+          return "Invalid integer literal";
+        }
+    } else {
+        double d = jvp_strtod(&p->dtoa, p->tokenbuf, &end);
+        if (end == 0 || *end != 0)
+          return "Invalid numeric literal";
+        TRY(value(p, jv_number(d)));
+    }
   }
   p->tokenpos = 0;
   return 0;

@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <float.h>
 #include <string.h>
+#include <stdint.h>
 
 #include "jv_dtoa.h"
 #include "jv_unicode.h"
@@ -148,6 +149,13 @@ static void jv_dump_term(struct dtoa_context* C, jv x, int flags, int indent, FI
       put_str(jvp_dtoa_fmt(C, buf, d), F, S);
     }
     break;
+  case JV_KIND_INTEGER: {
+    long long int v = jv_integer_value(x);
+    sprintf(buf, "%lld", v);
+    put_str(buf, F, S);
+    break;
+
+  }
   }
   case JV_KIND_STRING:
     jvp_dump_string(x, flags & JV_PRINT_ASCII, F, S);

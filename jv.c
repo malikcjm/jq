@@ -49,6 +49,7 @@ const char* jv_kind_name(jv_kind k) {
   case JV_KIND_STRING:  return "string";
   case JV_KIND_ARRAY:   return "array";
   case JV_KIND_OBJECT:  return "object";
+  case JV_KIND_INTEGER: return "integer";
   }
   assert(0 && "invalid kind");
   return "<unknown>";
@@ -132,6 +133,18 @@ jv jv_number(double x) {
 double jv_number_value(jv j) {
   assert(jv_get_kind(j) == JV_KIND_NUMBER);
   return j.val.number;
+}
+
+jv jv_integer(int64_t x) {
+  jv j;
+  j.kind = JV_KIND_INTEGER;
+  j.val.integer = x;
+  return j;
+}
+
+int64_t jv_integer_value(jv j) {
+  assert(jv_get_kind(j) == JV_KIND_INTEGER);
+  return j.val.integer;
 }
 
 
@@ -987,10 +1000,9 @@ int jv_get_refcnt(jv j) {
 
 int jv_equal(jv a, jv b) {
   int r;
+
   if (jv_get_kind(a) != jv_get_kind(b)) {
     r = 0;
-  } else if (jv_get_kind(a) == JV_KIND_NUMBER) {
-    r = jv_number_value(a) == jv_number_value(b);
   } else if (a.val.complex.ptr == b.val.complex.ptr &&
              a.val.complex.i[0] == b.val.complex.i[0] &&
              a.val.complex.i[1] == b.val.complex.i[1]) {
@@ -1011,6 +1023,17 @@ int jv_equal(jv a, jv b) {
       break;
     }
   }
+
+  if (jv_get_kind(a) == JV_KIND_NUMBER && jv_get_kind(b) == JV_KIND_NUMBER) {
+    r = jv_number_value(a) == jv_number_value(b);
+  } else if (jv_get_kind(a) == JV_KIND_INTEGER && jv_get_kind(b) == JV_KIND_INTEGER) {
+    r = jv_integer_value(a) == jv_integer_value(b);
+  } else if (jv_get_kind(a) == JV_KIND_NUMBER && jv_get_kind(b) == JV_KIND_INTEGER) {
+    r = jv_number_value(a) == jv_integer_value(b);
+  } else if (jv_get_kind(a) == JV_KIND_INTEGER && jv_get_kind(b) == JV_KIND_NUMBER) {
+    r = jv_integer_value(a) == jv_number_value(b);
+  }
+
   jv_free(a);
   jv_free(b);
   return r;

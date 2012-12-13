@@ -52,14 +52,19 @@ static jv f_plus(jv input, jv a, jv b) {
     jv_free(b);
     return a;
   } else if (jv_get_kind(a) == JV_KIND_NUMBER && jv_get_kind(b) == JV_KIND_NUMBER) {
-    return jv_number(jv_number_value(a) + 
-                     jv_number_value(b));
+    return jv_number(jv_number_value(a) + jv_number_value(b));
+  } else if (jv_get_kind(a) == JV_KIND_NUMBER && jv_get_kind(b) == JV_KIND_INTEGER) {
+    return jv_number(jv_number_value(a) + jv_integer_value(b));
+  } else if (jv_get_kind(a) == JV_KIND_INTEGER && jv_get_kind(b) == JV_KIND_NUMBER) {
+    return jv_number(jv_integer_value(a) + jv_number_value(b));
   } else if (jv_get_kind(a) == JV_KIND_STRING && jv_get_kind(b) == JV_KIND_STRING) {
     return jv_string_concat(a, b);
   } else if (jv_get_kind(a) == JV_KIND_ARRAY && jv_get_kind(b) == JV_KIND_ARRAY) {
     return jv_array_concat(a, b);
   } else if (jv_get_kind(a) == JV_KIND_OBJECT && jv_get_kind(b) == JV_KIND_OBJECT) {
     return jv_object_merge(a, b);
+  } else if (jv_get_kind(a) == JV_KIND_INTEGER && jv_get_kind(b) == JV_KIND_INTEGER) {
+    return jv_integer(jv_integer_value(a) + jv_integer_value(b));
   } else {
     return type_error2(a, b, "cannot be added");
   }
@@ -78,6 +83,12 @@ static jv f_minus(jv input, jv a, jv b) {
   jv_free(input);
   if (jv_get_kind(a) == JV_KIND_NUMBER && jv_get_kind(b) == JV_KIND_NUMBER) {
     return jv_number(jv_number_value(a) - jv_number_value(b));
+  } else if (jv_get_kind(a) == JV_KIND_INTEGER && jv_get_kind(b) == JV_KIND_NUMBER) {
+    return jv_number(jv_integer_value(a) - jv_number_value(b));
+  } else if (jv_get_kind(a) == JV_KIND_NUMBER && jv_get_kind(b) == JV_KIND_INTEGER) {
+    return jv_number(jv_number_value(a) - jv_integer_value(b));
+  } else if (jv_get_kind(a) == JV_KIND_INTEGER && jv_get_kind(b) == JV_KIND_INTEGER) {
+    return jv_integer(jv_integer_value(a) - jv_integer_value(b));
   } else if (jv_get_kind(a) == JV_KIND_ARRAY && jv_get_kind(b) == JV_KIND_ARRAY) {
     jv out = jv_array();
     jv_array_foreach(a, i, x) {
@@ -104,6 +115,12 @@ static jv f_multiply(jv input, jv a, jv b) {
   jv_free(input);
   if (jv_get_kind(a) == JV_KIND_NUMBER && jv_get_kind(b) == JV_KIND_NUMBER) {
     return jv_number(jv_number_value(a) * jv_number_value(b));
+  } else if (jv_get_kind(a) == JV_KIND_INTEGER && jv_get_kind(b) == JV_KIND_NUMBER) {
+    return jv_number(jv_integer_value(a) * jv_number_value(b));
+  } else if (jv_get_kind(a) == JV_KIND_NUMBER && jv_get_kind(b) == JV_KIND_INTEGER) {
+    return jv_number(jv_number_value(a) * jv_integer_value(b));
+  } else if (jv_get_kind(a) == JV_KIND_INTEGER && jv_get_kind(b) == JV_KIND_INTEGER) {
+    return jv_integer(jv_integer_value(a) * jv_integer_value(b));
   } else {
     return type_error2(a, b, "cannot be multiplied");
   }  
@@ -113,6 +130,12 @@ static jv f_divide(jv input, jv a, jv b) {
   jv_free(input);
   if (jv_get_kind(a) == JV_KIND_NUMBER && jv_get_kind(b) == JV_KIND_NUMBER) {
     return jv_number(jv_number_value(a) / jv_number_value(b));
+  } else if (jv_get_kind(a) == JV_KIND_INTEGER && jv_get_kind(b) == JV_KIND_NUMBER) {
+    return jv_number(jv_integer_value(a) / jv_number_value(b));
+  } else if (jv_get_kind(a) == JV_KIND_NUMBER && jv_get_kind(b) == JV_KIND_INTEGER) {
+    return jv_number(jv_number_value(a) / jv_integer_value(b));
+  } else if (jv_get_kind(a) == JV_KIND_INTEGER && jv_get_kind(b) == JV_KIND_INTEGER) {
+    return jv_number((double)jv_integer_value(a) / jv_integer_value(b));
   } else {
     return type_error2(a, b, "cannot be divided");
   }  
@@ -171,10 +194,13 @@ static jv f_contains(jv a, jv b) {
 static jv f_tonumber(jv input) {
   if (jv_get_kind(input) == JV_KIND_NUMBER) {
     return input;
+  } 
+  if (jv_get_kind(input) == JV_KIND_INTEGER) {
+    return input;
   }
   if (jv_get_kind(input) == JV_KIND_STRING) {
     jv parsed = jv_parse(jv_string_value(input));
-    if (!jv_is_valid(parsed) || jv_get_kind(parsed) == JV_KIND_NUMBER) {
+    if (!jv_is_valid(parsed) || jv_get_kind(parsed) == JV_KIND_NUMBER || jv_get_kind(parsed) == JV_KIND_INTEGER) {
       jv_free(input);
       return parsed;
     }

@@ -12,10 +12,11 @@ typedef enum {
   JV_KIND_NULL,
   JV_KIND_FALSE,
   JV_KIND_TRUE,
+  JV_KIND_INTEGER,
   JV_KIND_NUMBER,
   JV_KIND_STRING,
   JV_KIND_ARRAY,
-  JV_KIND_OBJECT
+  JV_KIND_OBJECT,
 } jv_kind;
 
 typedef struct {
@@ -30,6 +31,7 @@ typedef struct{
 typedef struct {
   jv_kind kind;
   union {
+    int64_t integer;
     double number;
     jv_complex complex;
   } val;
@@ -63,6 +65,9 @@ jv jv_bool(int);
 
 jv jv_number(double);
 double jv_number_value(jv);
+
+jv jv_integer(int64_t);
+int64_t jv_integer_value(jv);
 
 jv jv_array();
 jv jv_array_sized(int);

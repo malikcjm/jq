@@ -7,6 +7,7 @@
 
 static void jv_test();
 static void run_jq_tests();
+static void test_number();
 
 FILE* testdata;
 
@@ -25,11 +26,23 @@ int main(int argc, char* argv[]) {
     return 127;
   }
   run_jq_tests();
+  test_number();
   if (testdata != stdin) fclose(testdata);
 }
 
 
-
+static void test_number() {
+  {
+    jv o1 = jv_object();
+    o1 = jv_object_set(o1, jv_string("foo"), jv_integer(8658678073598930784L));
+    jv_dump(jv_copy(o1), 0); printf("\n");
+  }
+  {
+    jv o1 = jv_integer(1);
+    jv o2 = jv_number(1.0);
+    assert(jv_equal(jv_copy(o1), jv_copy(o2)));
+  }
+}
 
 static int skipline(const char* buf) {
   int p = 0;
@@ -72,9 +85,9 @@ static void run_jq_tests() {
         pass = 0;
         break;
       } else if (!jv_equal(jv_copy(expected), jv_copy(actual))) {
-        printf("*** Expected ");
+        printf("*** Expected %d: ", jv_get_kind(expected));
         jv_dump(jv_copy(expected), 0);
-        printf(", but got ");
+        printf(", but got %d: ", jv_get_kind(actual));
         jv_dump(jv_copy(actual), 0);
         printf("\n");
         pass = 0;
@@ -109,6 +122,16 @@ static void run_jq_tests() {
 
 static void jv_test() {
   /// Arrays and numbers
+  {
+    jv a = jv_array();
+    assert(jv_get_kind(a) == JV_KIND_ARRAY);
+    assert(jv_array_length(jv_copy(a)) == 0);
+    assert(jv_array_length(jv_copy(a)) == 0);
+
+    a = jv_array_append(a, jv_integer(42));
+    assert(jv_array_length(jv_copy(a)) == 1);
+    assert(jv_integer_value(jv_array_get(jv_copy(a), 0)) == 42);
+  }
   {
     jv a = jv_array();
     assert(jv_get_kind(a) == JV_KIND_ARRAY);

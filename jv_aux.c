@@ -18,8 +18,15 @@ jv jv_get(jv t, jv k) {
       jv_free(v);
       v = jv_null();
     }
+  } else if (jv_get_kind(t) == JV_KIND_ARRAY && jv_get_kind(k) == JV_KIND_INTEGER) {
+    // FIXME: don't do lookup for noninteger index
+    v = jv_array_get(t, (int)jv_integer_value(k));
+    if (!jv_is_valid(v)) {
+      jv_free(v);
+      v = jv_null();
+    }
   } else if (jv_get_kind(t) == JV_KIND_NULL && 
-             (jv_get_kind(k) == JV_KIND_STRING || jv_get_kind(k) == JV_KIND_NUMBER)) {
+             (jv_get_kind(k) == JV_KIND_STRING || jv_get_kind(k) == JV_KIND_NUMBER || jv_get_kind(k) == JV_KIND_INTEGER)) {
     jv_free(t);
     jv_free(k);
     v = jv_null();
@@ -48,6 +55,11 @@ jv jv_set(jv t, jv k, jv v) {
              (jv_get_kind(t) == JV_KIND_ARRAY || isnull)) {
     if (isnull) t = jv_array();
     t = jv_array_set(t, (int)jv_number_value(k), v);
+  } else if (jv_get_kind(k) == JV_KIND_INTEGER &&
+             (jv_get_kind(t) == JV_KIND_ARRAY || isnull)) {
+    if (isnull) t = jv_array();
+    t = jv_array_set(t, (int)jv_integer_value(k), v);
+
   } else {
     jv err = jv_invalid_with_msg(jv_string_fmt("Cannot update field at %s index of %s",
                                                jv_kind_name(jv_get_kind(t)),
@@ -307,6 +319,14 @@ int jv_cmp(jv a, jv b) {
     else if (db != db) r = jv_cmp(jv_number(da), jv_null());
     else if (da < db) r = -1;
     else if (da == db) r = 0;
+    else r = 1;
+    break;
+  }
+
+  case JV_KIND_INTEGER: {
+    int64_t lla = jv_integer_value(a), llb = jv_integer_value(b);
+    if (lla < llb) r = -1;
+    else if (lla == llb) r = 0;
     else r = 1;
     break;
   }
