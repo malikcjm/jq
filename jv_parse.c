@@ -244,7 +244,6 @@ static pfunc check_literal(struct jv_parser* p) {
     // FIXME: better parser
     p->tokenbuf[p->tokenpos] = 0; // FIXME: invalid
     char* end = 0;
-    //if (0) {
     if (!strpbrk(p->tokenbuf, ".e")) {
         int64_t ll = strtoll(p->tokenbuf, &end, 10);
         if (end != 0 && *end == 0) {

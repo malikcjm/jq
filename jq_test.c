@@ -87,7 +87,7 @@ static void run_jq_tests() {
       } else if (!jv_equal(jv_copy(expected), jv_copy(actual))) {
         printf("*** Expected %d: ", jv_get_kind(expected));
         jv_dump(jv_copy(expected), 0);
-        printf(", but got %d: ", jv_get_kind(actual));
+        printf(", but got ");
         jv_dump(jv_copy(actual), 0);
         printf("\n");
         pass = 0;

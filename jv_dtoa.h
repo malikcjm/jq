@@ -1,6 +1,6 @@
 #ifndef JV_DTOA_H
 #define JV_DTOA_H
-#define Kmax 20 
+#define Kmax 7 
 
 struct Bigint;
 struct dtoa_context {
