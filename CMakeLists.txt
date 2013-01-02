@@ -38,3 +38,4 @@ add_executable(jq ${JQ_SRC} main.c ${BISON_parser_OUTPUTS} ${FLEX_lexer_OUTPUTS}
 add_dependencies(jq gen_utf8_tables gen_version)
 
 add_executable(jq_test ${JQ_SRC} jq_test.c ${BISON_parser_OUTPUTS} ${FLEX_lexer_OUTPUTS})
+install_programs(FILES jq)
