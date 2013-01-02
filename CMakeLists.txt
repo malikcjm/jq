@@ -31,7 +31,9 @@ set(JQ_SRC
     jv_print.c 
     jv_dtoa.c 
     jv_unicode.c 
-    jv_aux.c)
+    jv_aux.c
+    jv_alloc.c
+)
 
 
 add_executable(jq ${JQ_SRC} main.c ${BISON_parser_OUTPUTS} ${FLEX_lexer_OUTPUTS})
