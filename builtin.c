@@ -296,9 +296,11 @@ static jv f_format(jv input, jv fmt) {
           /* NaN, render as empty string */
           jv_free(x);
         } else {
-          line = jv_string_concat(line, jv_dump_string(x, 0));
         }
         break;
+      case JV_KIND_INTEGER:
+        line = jv_string_concat(line, jv_dump_string(x, 0));
+        break
       case JV_KIND_STRING: {
         line = jv_string_append_str(line, "\"");
         line = jv_string_concat(line, escape_string(x, "\"\"\"\0"));

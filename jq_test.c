@@ -56,7 +56,7 @@ static void run_jq_tests() {
   int tests = 0, passed = 0, invalid = 0;
 
   while (1) {
-    if (!fgets(buf, sizeof(buf), testdata)) break;
+    if (!fgets(buf, sizeof(buf)-1, testdata)) break;
     if (skipline(buf)) continue;
     if (buf[strlen(buf)-1] == '\n') buf[strlen(buf)-1] = 0;
     printf("Testing %s\n", buf);
