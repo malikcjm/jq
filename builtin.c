@@ -71,10 +71,14 @@ static jv f_plus(jv input, jv a, jv b) {
 }
 
 static jv f_negate(jv input) {
-  if (jv_get_kind(input) != JV_KIND_NUMBER) {
+  jv ret; 
+  if (jv_get_kind(input) == JV_KIND_NUMBER) {
+      ret = jv_number(-jv_number_value(input));
+  } else if (jv_get_kind(input) == JV_KIND_INTEGER) {
+      ret = jv_integer(-jv_integer_value(input));
+  } else {
     return type_error(input, "cannot be negated");
   }
-  jv ret = jv_number(-jv_number_value(input));
   jv_free(input);
   return ret;
 }
@@ -300,7 +304,7 @@ static jv f_format(jv input, jv fmt) {
         break;
       case JV_KIND_INTEGER:
         line = jv_string_concat(line, jv_dump_string(x, 0));
-        break
+        break;
       case JV_KIND_STRING: {
         line = jv_string_append_str(line, "\"");
         line = jv_string_concat(line, escape_string(x, "\"\"\"\0"));

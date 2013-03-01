@@ -86,7 +86,13 @@ jv jv_dels(jv t, jv keys) {
       int del = 0;
       while (kidx < jv_array_length(jv_copy(keys))) {
         jv nextdel = jv_array_get(jv_copy(keys), kidx);
-        if (jv_get_kind(nextdel) != JV_KIND_NUMBER) {
+        int delidx = -1;
+
+        if (jv_get_kind(nextdel) == JV_KIND_NUMBER) { 
+          delidx = (int)jv_number_value(nextdel);
+        } else if (jv_get_kind(nextdel) == JV_KIND_INTEGER) {
+          delidx = (int)jv_integer_value(nextdel);
+        } else {
           jv err = jv_invalid_with_msg(jv_string_fmt("Cannot delete %s element of array",
                                                      jv_kind_name(jv_get_kind(nextdel))));
           jv_free(nextdel);
@@ -95,7 +101,6 @@ jv jv_dels(jv t, jv keys) {
           new_array = err;
           goto arr_out; // break twice
         }
-        int delidx = (int)jv_number_value(nextdel);
         jv_free(nextdel);
         if (i == delidx) {
           del = 1;
